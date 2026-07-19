@@ -1,0 +1,137 @@
+[
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "12:14",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "12:19",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "12:44",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "12:49",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "13:14",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "13:19",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "13:44",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "13:49",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "14:14",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "14:19",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "14:44",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "14:49",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "15:14",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "15:19",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "15:44",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "15:49",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "16:14",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "16:19",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "16:44",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "16:49",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "S-Bahn",
+    "lineName": "S2",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "17:14",
+    "toStop": "Bahnhof Zschortau",
+    "arrivalTime": "17:19",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 191",
+    "fromStop": "Delitzsch (Schule)",
+    "departureTime": "12:50",
+    "toStop": "Schule Zschortau",
+    "arrivalTime": "13:05",
+    "requiredWalkBuffer": 5
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 191",
+    "fromStop": "Delitzsch (Schule)",
+    "departureTime": "13:30",
+    "toStop": "Schule Zschortau",
+    "arrivalTime": "13:45",
+    "requiredWalkBuffer": 5
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 191",
+    "fromStop": "Delitzsch (Schule)",
+    "departureTime": "14:35",
+    "toStop": "Schule Zschortau",
+    "arrivalTime": "14:50",
+    "requiredWalkBuffer": 5
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 195",
+    "fromStop": "Delitzsch (Schule)",
+    "departureTime": "15:40",
+    "toStop": "Schule Zschortau",
+    "arrivalTime": "15:55",
+    "requiredWalkBuffer": 5
+  }
+]
