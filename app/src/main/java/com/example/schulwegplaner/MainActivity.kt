@@ -1,8 +1,11 @@
 package com.example.schulwegplaner
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,27 +23,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import android.content.Context
-import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import retrofit2.http.Url
-import kotlinx.serialization.encodeToString
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.http.Url
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.concurrent.TimeUnit
+import androidx.core.content.edit
 
 
 @Serializable
@@ -135,7 +137,7 @@ object LocalTimetable {
             try {
                 val parsed = Json.decodeFromString<List<OfflineConnection>>(cachedJson)
                 connections = parsed.map { it.toCleanUiConnection() }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Bei Fehlern bleiben die defaultConnections erhalten
             }
         }
@@ -152,13 +154,13 @@ object LocalTimetable {
             val jsonString = Json.encodeToString(newConnections)
             val prefs = context.getSharedPreferences("timetable_prefs", Context.MODE_PRIVATE)
             val formattedNow = java.time.LocalDateTime.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm"))
-            prefs.edit()
-                .putString("timetable_json", jsonString)
-                .putString("timetable_last_sync", formattedNow)
-                .apply()
+                .format(DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm"))
+            prefs.edit {
+                putString("timetable_json", jsonString)
+                putString("timetable_last_sync", formattedNow)
+            }
             true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -167,9 +169,10 @@ object LocalTimetable {
 interface TransportApiService {
     @GET("journeys")
     suspend fun getConnections(
-        @Query("from") from: String = "Delitzsch",
-        @Query("to") to: String = "Zschortau",
-        @Query("results") results: Int = 8
+        @Query("from") from: String = "8010077", // Delitzsch unt Bf
+        @Query("to") to: String = "8010403",   // Zschortau
+        @Query("departure") departure: String? = null,
+        @Query("results") results: Int = 12
     ): JourneyResponse
 
     @GET
@@ -179,10 +182,10 @@ interface TransportApiService {
 object NetworkClient {
     private val json = Json { ignoreUnknownKeys = true }
 
-    // Erhöht auf 8 Sekunden für schlechten Empfang auf dem Schulhof
+    // Erhöht auf 15 Sekunden, da die öffentliche API oft langsam reagiert
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(8, TimeUnit.SECONDS)
-        .readTimeout(8, TimeUnit.SECONDS)
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
         .build()
 
     val apiService: TransportApiService by lazy {
@@ -219,13 +222,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun fetchRemoteTimetable() {
         viewModelScope.launch {
             try {
+                // Link exakt nach deiner Raw-URL angepasst
                 val url = "https://raw.githubusercontent.com/Herje70/Schulwegplaner/main/timetable.json"
                 val response = NetworkClient.apiService.downloadTimetable(url)
                 if (LocalTimetable.saveTimetable(getApplication(), response)) {
                     lastSyncTime = LocalTimetable.getLastSyncTime(getApplication())
                 }
             } catch (e: Exception) {
-                // Fehler beim Hintergrund-Laden ignorieren
+                // Fehler loggen für Debugging
+                e.printStackTrace()
             }
         }
     }
@@ -243,7 +248,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                val response = NetworkClient.apiService.getConnections()
+                // Wir senden das heutige Datum kombiniert mit der eingegebenen Uhrzeit an die API
+                val departureDateTime = java.time.LocalDateTime.now()
+                    .with(parsedEndTime)
+                    .format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+
+                val response = NetworkClient.apiService.getConnections(departure = departureDateTime)
                 val rawJourneys = response.journeys ?: emptyList()
 
                 val liveResults = rawJourneys.mapNotNull { journey ->
@@ -303,6 +313,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -319,18 +330,28 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
     var timeInput by remember { mutableStateOf("13:15") }
     var showTimePicker by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // App Header
-        Text(text = "Schulweg-Planer", fontSize = 26.sp, fontWeight = FontWeight.Bold)
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // App Header
+            Text(text = "Schulweg-Planer", fontSize = 26.sp, fontWeight = FontWeight.Bold)
         Text(
             text = "Ehrenberg-Gymnasium Delitzsch ➔ Zschortau",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Text(
+            text = "Offline-Daten: ${viewModel.lastSyncTime}",
+            fontSize = 10.sp,
+            color = MaterialTheme.colorScheme.outline,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -467,6 +488,7 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         }
     }
 }
+}
 
 
 @Composable
@@ -481,7 +503,7 @@ fun StatusIndicator(isBackupActive: Boolean, lastSyncTime: String = "") {
             "Offline-Fahrplan (Standard) — DB-Server meldet Timeout"
         }
     } else {
-        "Live-Fahrplan (Echtzeit aktiv)"
+        "Live-Fahrplan aktiv (Backup-Stand: $lastSyncTime)"
     }
 
     Row(
@@ -530,7 +552,7 @@ fun ConnectionDisplayCard(connection: CleanUiConnection) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Divider(color = MaterialTheme.colorScheme.outlineVariant)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
