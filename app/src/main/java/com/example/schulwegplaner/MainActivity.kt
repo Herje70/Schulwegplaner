@@ -1,3 +1,4 @@
+@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package com.example.schulwegplaner
 
 import android.app.Application
@@ -228,9 +229,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (LocalTimetable.saveTimetable(getApplication(), response)) {
                     lastSyncTime = LocalTimetable.getLastSyncTime(getApplication())
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Fehler loggen für Debugging
-                e.printStackTrace()
             }
         }
     }
@@ -241,7 +241,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val parsedEndTime = try {
             LocalTime.parse(schoolEndTimeText.trim(), DateTimeFormatter.ofPattern("HH:mm"))
-        } catch (e: DateTimeParseException) {
+        } catch (_: DateTimeParseException) {
             uiState = UiState.ApiFailed("Ungültiges Uhrzeitformat.", schoolEndTimeText)
             return
         }
@@ -251,7 +251,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 // Wir senden das heutige Datum kombiniert mit der eingegebenen Uhrzeit an die API
                 val departureDateTime = java.time.LocalDateTime.now()
                     .with(parsedEndTime)
-                    .format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
 
                 val response = NetworkClient.apiService.getConnections(departure = departureDateTime)
                 val rawJourneys = response.journeys ?: emptyList()
@@ -282,7 +282,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 uiState = UiState.Success(liveResults, isLive = true)
 
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Automatischer Fallback auf den Offline-Fahrplan, da die Live-API offline oder überlastet ist
                 val offlineResults = LocalTimetable.connections.filter { connection ->
                     val earliestPossibleDeparture = parsedEndTime.plusMinutes(connection.requiredWalkBuffer.toLong())
