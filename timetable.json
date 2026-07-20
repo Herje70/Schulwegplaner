@@ -100,7 +100,7 @@
   },
   {
     "type": "Bus",
-    "lineName": "Linie 191",
+    "lineName": "Linie 192",
     "fromStop": "Delitzsch (Schule)",
     "departureTime": "12:50",
     "toStop": "Schule Zschortau",
@@ -109,7 +109,7 @@
   },
   {
     "type": "Bus",
-    "lineName": "Linie 191",
+    "lineName": "Linie 192",
     "fromStop": "Delitzsch (Schule)",
     "departureTime": "13:30",
     "toStop": "Schule Zschortau",
@@ -118,7 +118,7 @@
   },
   {
     "type": "Bus",
-    "lineName": "Linie 191",
+    "lineName": "Linie 192",
     "fromStop": "Delitzsch (Schule)",
     "departureTime": "14:35",
     "toStop": "Schule Zschortau",

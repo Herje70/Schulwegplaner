@@ -72,7 +72,7 @@ data class Line(val name: String? = null, val mode: String? = null)
 // Einheitliches Datenmodell für die Anzeige im UI (unabhängig von Online/Offline)
 data class CleanUiConnection(
     val type: String,               // "S-Bahn" oder "Bus"
-    val lineName: String,           // z.B. "S2" oder "Bus 191"
+    val lineName: String,           // z.B. "S2" oder "Bus 192"
     val fromStop: String,           // Start-Haltestelle
     val departureTime: LocalTime,
     val delayMinutes: Int,          // Echtzeitverspätung
@@ -122,9 +122,9 @@ object LocalTimetable {
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(16, 44), 0, "Bahnhof Zschortau", LocalTime.of(16, 49), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(17, 14), 0, "Bahnhof Zschortau", LocalTime.of(17, 19), 15, false),
 
-        CleanUiConnection("Bus", "Linie 191", "Delitzsch (Schule)", LocalTime.of(12, 50), 0, "Schule Zschortau", LocalTime.of(13, 5), 5, false),
-        CleanUiConnection("Bus", "Linie 191", "Delitzsch (Schule)", LocalTime.of(13, 30), 0, "Schule Zschortau", LocalTime.of(13, 45), 5, false),
-        CleanUiConnection("Bus", "Linie 191", "Delitzsch (Schule)", LocalTime.of(14, 35), 0, "Schule Zschortau", LocalTime.of(14, 50), 5, false),
+        CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(12, 50), 0, "Schule Zschortau", LocalTime.of(13, 5), 5, false),
+        CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(13, 30), 0, "Schule Zschortau", LocalTime.of(13, 45), 5, false),
+        CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(14, 35), 0, "Schule Zschortau", LocalTime.of(14, 50), 5, false),
         CleanUiConnection("Bus", "Linie 195", "Delitzsch (Schule)", LocalTime.of(15, 40), 0, "Schule Zschortau", LocalTime.of(15, 55), 5, false)
     )
 
