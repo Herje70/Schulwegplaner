@@ -1,0 +1,33 @@
+name: Update Timetable JSON
+
+on:
+  schedule:
+    # Läuft jeden Sonntag um Mitternacht
+    - cron: '0 0 * * 0'
+  workflow_dispatch: # Ermöglicht es dir, das Update manuell auf GitHub zu starten
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4 # Aktualisiert von v3 auf v4
+
+      - name: Python installieren
+        uses: actions/setup-python@v5 # Aktualisiert von v4 auf v5
+        with:
+          python-version: '3.x'
+
+      - name: Abhängigkeiten installieren
+        run: pip install requests
+
+      - name: Script ausführen
+        run: python update_timetable.py
+
+      - name: Änderungen speichern
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add timetable.json
+          git commit -m "Automatisches Fahrplan-Update" || exit 0
+          git push
