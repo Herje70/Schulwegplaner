@@ -133,5 +133,32 @@
     "toStop": "Schule Zschortau",
     "arrivalTime": "15:55",
     "requiredWalkBuffer": 5
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 211",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "13:44",
+    "toStop": "Zschortau Neue Str",
+    "arrivalTime": "14:05",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 211",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "14:44",
+    "toStop": "Zschortau Neue Str",
+    "arrivalTime": "15:05",
+    "requiredWalkBuffer": 15
+  },
+  {
+    "type": "Bus",
+    "lineName": "Linie 211",
+    "fromStop": "Delitzsch unt Bf",
+    "departureTime": "15:44",
+    "toStop": "Zschortau Neue Str",
+    "arrivalTime": "16:05",
+    "requiredWalkBuffer": 15
   }
 ]

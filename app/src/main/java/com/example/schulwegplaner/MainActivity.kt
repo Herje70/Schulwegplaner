@@ -125,7 +125,11 @@ object LocalTimetable {
         CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(12, 50), 0, "Schule Zschortau", LocalTime.of(13, 5), 5, false),
         CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(13, 30), 0, "Schule Zschortau", LocalTime.of(13, 45), 5, false),
         CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(14, 35), 0, "Schule Zschortau", LocalTime.of(14, 50), 5, false),
-        CleanUiConnection("Bus", "Linie 195", "Delitzsch (Schule)", LocalTime.of(15, 40), 0, "Schule Zschortau", LocalTime.of(15, 55), 5, false)
+        CleanUiConnection("Bus", "Linie 195", "Delitzsch (Schule)", LocalTime.of(15, 40), 0, "Schule Zschortau", LocalTime.of(15, 55), 5, false),
+
+        CleanUiConnection("Bus", "Linie 211", "Delitzsch unt Bf", LocalTime.of(13, 44), 0, "Zschortau Neue Str", LocalTime.of(14, 5), 15, false),
+        CleanUiConnection("Bus", "Linie 211", "Delitzsch unt Bf", LocalTime.of(14, 44), 0, "Zschortau Neue Str", LocalTime.of(15, 5), 15, false),
+        CleanUiConnection("Bus", "Linie 211", "Delitzsch unt Bf", LocalTime.of(15, 44), 0, "Zschortau Neue Str", LocalTime.of(16, 5), 15, false)
     )
 
     var connections: List<CleanUiConnection> = defaultConnections
@@ -170,8 +174,8 @@ object LocalTimetable {
 interface TransportApiService {
     @GET("journeys")
     suspend fun getConnections(
-        @Query("from") from: String = "8010077", // Delitzsch unt Bf
-        @Query("to") to: String = "8010403",   // Zschortau
+        @Query("from") from: String = "Delitzsch",
+        @Query("to") to: String = "Zschortau",
         @Query("departure") departure: String? = null,
         @Query("results") results: Int = 12
     ): JourneyResponse
