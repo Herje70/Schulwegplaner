@@ -7,9 +7,11 @@ def fetch_connections():
     days_until_monday = (7 - today.weekday()) % 7
     if days_until_monday == 0: 
         days_until_monday = 7
-    next_monday = (today + timedelta(days=days_until_monday)).replace(hour=12, minute=0, second=0)
+    # Wir suchen nach Verbindungen ab 08:00 Uhr, um den ganzen Tag abzudecken
+    next_monday = (today + timedelta(days=days_until_monday)).replace(hour=8, minute=0, second=0)
     
-    url = f"https://v6.db.transport.rest/journeys?from=Delitzsch&to=Zschortau&departure={next_monday.isoformat()}&results=20"
+    # Mehr Ergebnisse (results=50) anfordern, um den Vormittag und Nachmittag zu erfassen
+    url = f"https://v6.db.transport.rest/journeys?from=Delitzsch&to=Zschortau&departure={next_monday.isoformat()}&results=50"
     
     # WICHTIG: Eigenen User-Agent mitgeben, um den 503-Block von Python-Requests zu umgehen!
     headers = {

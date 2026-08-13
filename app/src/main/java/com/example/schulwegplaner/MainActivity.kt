@@ -110,6 +110,13 @@ data class OfflineConnection(
 
 object LocalTimetable {
     private val defaultConnections = listOf(
+        // Vormittags-Verbindungen (neu hinzugefügt)
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(8, 44), 0, "Bahnhof Zschortau", LocalTime.of(8, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(9, 44), 0, "Bahnhof Zschortau", LocalTime.of(9, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(10, 44), 0, "Bahnhof Zschortau", LocalTime.of(10, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(11, 44), 0, "Bahnhof Zschortau", LocalTime.of(11, 49), 15, false),
+
+        // Nachmittags-Verbindungen
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(12, 14), 0, "Bahnhof Zschortau", LocalTime.of(12, 19), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(12, 44), 0, "Bahnhof Zschortau", LocalTime.of(12, 49), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(13, 14), 0, "Bahnhof Zschortau", LocalTime.of(13, 19), 15, false),
