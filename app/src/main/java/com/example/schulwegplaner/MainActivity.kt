@@ -47,20 +47,13 @@ import androidx.core.content.edit
 
 
 @Serializable
-data class JourneyResponse(val journeys: List<Journey>? = null)
-
-@Serializable
-data class Journey(val legs: List<Leg>? = null)
-
-@Serializable
-data class Leg(
-    val origin: Stop? = null,
-    val destination: Stop? = null,
-    val departure: String? = null,
-    val arrival: String? = null,
-    val departureDelay: Int? = null,
+data class HafasDeparture(
+    @kotlinx.serialization.SerialName("when") val actualWhen: String? = null,
+    val plannedWhen: String? = null,
+    val delay: Int? = null,
+    val direction: String? = null,
     val line: Line? = null,
-    val walking: Boolean? = false
+    val stop: Stop? = null
 )
 
 @Serializable
@@ -116,7 +109,13 @@ object LocalTimetable {
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(10, 44), 0, "Bahnhof Zschortau", LocalTime.of(10, 49), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(11, 44), 0, "Bahnhof Zschortau", LocalTime.of(11, 49), 15, false),
 
-        // Nachmittags-Verbindungen
+        // Vormittags & Nachmittags S-Bahn (Alle 30 Min)
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(9, 14), 0, "Bahnhof Zschortau", LocalTime.of(9, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(9, 44), 0, "Bahnhof Zschortau", LocalTime.of(9, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(10, 14), 0, "Bahnhof Zschortau", LocalTime.of(10, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(10, 44), 0, "Bahnhof Zschortau", LocalTime.of(10, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(11, 14), 0, "Bahnhof Zschortau", LocalTime.of(11, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(11, 44), 0, "Bahnhof Zschortau", LocalTime.of(11, 49), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(12, 14), 0, "Bahnhof Zschortau", LocalTime.of(12, 19), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(12, 44), 0, "Bahnhof Zschortau", LocalTime.of(12, 49), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(13, 14), 0, "Bahnhof Zschortau", LocalTime.of(13, 19), 15, false),
@@ -128,6 +127,18 @@ object LocalTimetable {
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(16, 14), 0, "Bahnhof Zschortau", LocalTime.of(16, 19), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(16, 44), 0, "Bahnhof Zschortau", LocalTime.of(16, 49), 15, false),
         CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(17, 14), 0, "Bahnhof Zschortau", LocalTime.of(17, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(17, 44), 0, "Bahnhof Zschortau", LocalTime.of(17, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(18, 14), 0, "Bahnhof Zschortau", LocalTime.of(18, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(18, 44), 0, "Bahnhof Zschortau", LocalTime.of(18, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(19, 14), 0, "Bahnhof Zschortau", LocalTime.of(19, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(19, 44), 0, "Bahnhof Zschortau", LocalTime.of(19, 49), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(20, 14), 0, "Bahnhof Zschortau", LocalTime.of(20, 19), 15, false),
+        CleanUiConnection("S-Bahn", "S2", "Delitzsch unt Bf", LocalTime.of(20, 44), 0, "Bahnhof Zschortau", LocalTime.of(20, 49), 15, false),
+
+        // Busverbindungen (Vormittag & Schul-Stoßzeiten)
+        CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(9, 30), 0, "Schule Zschortau", LocalTime.of(9, 45), 5, false),
+        CleanUiConnection("Bus", "Linie 207", "Delitzsch unt Bf", LocalTime.of(10, 20), 0, "Zschortau Neue Str", LocalTime.of(10, 35), 15, false),
+        CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(11, 30), 0, "Schule Zschortau", LocalTime.of(11, 45), 5, false),
 
         CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(12, 50), 0, "Schule Zschortau", LocalTime.of(13, 5), 5, false),
         CleanUiConnection("Bus", "Linie 192", "Delitzsch (Schule)", LocalTime.of(13, 30), 0, "Schule Zschortau", LocalTime.of(13, 45), 5, false),
@@ -151,7 +162,10 @@ object LocalTimetable {
                 connections = parsed.map { it.toCleanUiConnection() }
             } catch (_: Exception) {
                 // Bei Fehlern bleiben die defaultConnections erhalten
+                connections = defaultConnections
             }
+        } else {
+            connections = defaultConnections
         }
     }
 
@@ -179,13 +193,11 @@ object LocalTimetable {
 }
 
 interface TransportApiService {
-    @GET("journeys")
-    suspend fun getConnections(
-        @Query("from") from: String = "Delitzsch",
-        @Query("to") to: String = "Zschortau",
-        @Query("departure") departure: String? = null,
-        @Query("results") results: Int = 12
-    ): JourneyResponse
+    @GET("departureStationBoard")
+    suspend fun getDepartures(
+        @Query("station") station: String = "8010077",
+        @Query("results") results: Int = 20
+    ): List<HafasDeparture>
 
     @GET
     suspend fun downloadTimetable(@Url url: String): List<OfflineConnection>
@@ -202,7 +214,7 @@ object NetworkClient {
 
     val apiService: TransportApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("https://v6.db.transport.rest/")
+            .baseUrl("https://bahn.expert/api/hafas/v3/")
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
@@ -234,14 +246,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun fetchRemoteTimetable() {
         viewModelScope.launch {
             try {
-                // Link exakt nach deiner Raw-URL angepasst
                 val url = "https://raw.githubusercontent.com/Herje70/Schulwegplaner/main/timetable.json"
                 val response = NetworkClient.apiService.downloadTimetable(url)
                 if (LocalTimetable.saveTimetable(getApplication(), response)) {
                     lastSyncTime = LocalTimetable.getLastSyncTime(getApplication())
                 }
             } catch (_: Exception) {
-                // Fehler loggen für Debugging
+                // Fehler ignorieren
             }
         }
     }
@@ -259,32 +270,41 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                // Wir senden das heutige Datum kombiniert mit der eingegebenen Uhrzeit an die API
-                val departureDateTime = java.time.LocalDateTime.now()
-                    .with(parsedEndTime)
-                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                val rawDepartures = NetworkClient.apiService.getDepartures()
 
-                val response = NetworkClient.apiService.getConnections(departure = departureDateTime)
-                val rawJourneys = response.journeys ?: emptyList()
-
-                val liveResults = rawJourneys.mapNotNull { journey ->
-                    val transitLeg = journey.legs?.firstOrNull { it.walking == false } ?: return@mapNotNull null
-                    val depTimeParsed = ZonedDateTime.parse(transitLeg.departure).toLocalTime()
-                    val arrTimeParsed = ZonedDateTime.parse(transitLeg.arrival).toLocalTime()
-                    val delayMin = (transitLeg.departureDelay ?: 0) / 60
-                    val isTrain = transitLeg.line?.mode == "train"
+                val liveResults = rawDepartures.mapNotNull { dep ->
+                    // Filter für Richtung Zschortau/Leipzig
+                    val dir = dep.direction ?: ""
+                    val isTowardsZschortau = dir.contains("Zschortau", ignoreCase = true) || 
+                                             dir.contains("Leipzig", ignoreCase = true) ||
+                                             dir.contains("Borna", ignoreCase = true) ||
+                                             dir.contains("Geithain", ignoreCase = true)
+                    
+                    if (!isTowardsZschortau) return@mapNotNull null
+                    
+                    val timeString = dep.actualWhen ?: dep.plannedWhen ?: return@mapNotNull null
+                    val depTimeParsed = try {
+                        ZonedDateTime.parse(timeString).toLocalTime()
+                    } catch (e: Exception) { return@mapNotNull null }
+                    
+                    val delayMin = (dep.delay ?: 0) / 60
+                    val isTrain = dep.line?.mode == "train" || dep.line?.name?.startsWith("S") == true
                     val buffer = if (isTrain) 15 else 5
+                    
+                    // Abfahrtstafeln enthalten keine Ankunftszeit am Ziel, daher schätzen wir
+                    val estimatedArrival = depTimeParsed.plusMinutes(if (isTrain) 5 else 15)
+
                     val earliestPossibleDeparture = parsedEndTime.plusMinutes(buffer.toLong())
 
                     if (!depTimeParsed.isBefore(earliestPossibleDeparture)) {
                         CleanUiConnection(
                             type = if (isTrain) "S-Bahn" else "Bus",
-                            lineName = transitLeg.line?.name ?: "ÖPNV",
-                            fromStop = transitLeg.origin?.name ?: "Abfahrt",
+                            lineName = dep.line?.name ?: "ÖPNV",
+                            fromStop = dep.stop?.name ?: "Delitzsch",
                             departureTime = depTimeParsed,
                             delayMinutes = delayMin,
-                            toStop = transitLeg.destination?.name ?: "Ankunft",
-                            arrivalTime = arrTimeParsed,
+                            toStop = "Zschortau (geschätzt)",
+                            arrivalTime = estimatedArrival,
                             requiredWalkBuffer = buffer,
                             isLive = true
                         )
@@ -407,8 +427,21 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showTimePicker = false }) {
-                        Text("Abbrechen")
+                    Row {
+                        TextButton(
+                            onClick = {
+                                val now = java.time.LocalTime.now()
+                                val formattedHour = now.hour.toString().padStart(2, '0')
+                                val formattedMinute = now.minute.toString().padStart(2, '0')
+                                timeInput = "$formattedHour:$formattedMinute"
+                                showTimePicker = false
+                            }
+                        ) {
+                            Text("Jetzt")
+                        }
+                        TextButton(onClick = { showTimePicker = false }) {
+                            Text("Abbrechen")
+                        }
                     }
                 },
                 text = {
