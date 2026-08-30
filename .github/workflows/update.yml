@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Code auschecken
-        uses: actions/checkout@v4 # Aktualisiert von v3 auf v4
+        uses: actions/checkout@v5   # Aktualisiert von v4 auf v5
 
       - name: Python installieren
-        uses: actions/setup-python@v5 # Aktualisiert von v4 auf v5
+        uses: actions/setup-python@v6   # Aktualisiert von v6 auf v6
         with:
           python-version: '3.x'
 
