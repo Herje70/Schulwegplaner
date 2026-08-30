@@ -13,15 +13,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.automirrored.rounded.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
@@ -285,7 +286,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val timeString = dep.actualWhen ?: dep.plannedWhen ?: return@mapNotNull null
                     val depTimeParsed = try {
                         ZonedDateTime.parse(timeString).toLocalTime()
-                    } catch (e: Exception) { return@mapNotNull null }
+                    } catch (_: Exception) { return@mapNotNull null }
                     
                     val delayMin = (dep.delay ?: 0) / 60
                     val isTrain = dep.line?.mode == "train" || dep.line?.name?.startsWith("S") == true
@@ -361,170 +362,245 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
     var timeInput by remember { mutableStateOf("13:15") }
     var showTimePicker by remember { mutableStateOf(false) }
 
+    val colorScheme = MaterialTheme.colorScheme
+
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            "Schulweg-Planer",
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold)
+                        )
+                        Text(
+                            "Ehrenberg-Gymnasium ➔ Zschortau",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colorScheme.secondary
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = colorScheme.surface
+                )
+            )
+        }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(colorScheme.surface, colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                    )
+                )
         ) {
-            // App Header
-            Text(text = "Schulweg-Planer", fontSize = 26.sp, fontWeight = FontWeight.Bold)
-        Text(
-            text = "Ehrenberg-Gymnasium Delitzsch ➔ Zschortau",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Text(
-            text = "Offline-Daten: ${viewModel.lastSyncTime}",
-            fontSize = 10.sp,
-            color = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // Zeit-Eingabefeld
-        OutlinedTextField(
-            value = timeInput,
-            onValueChange = { timeInput = it },
-            label = { Text("Unterrichtsende (z.B. 13:15)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            trailingIcon = {
-                IconButton(onClick = { showTimePicker = true }) {
-                    Text("⏰", fontSize = 20.sp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Header Info
+                Surface(
+                    color = colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                ) {
+                    Text(
+                        text = "Datenstand: ${viewModel.lastSyncTime}",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colorScheme.onSecondaryContainer
+                    )
                 }
-            }
-        )
 
-        if (showTimePicker) {
-            val parts = timeInput.split(":")
-            val initialHour = parts.getOrNull(0)?.toIntOrNull() ?: 13
-            val initialMinute = parts.getOrNull(1)?.toIntOrNull() ?: 15
-
-            val timePickerState = rememberTimePickerState(
-                initialHour = initialHour,
-                initialMinute = initialMinute,
-                is24Hour = true
-            )
-
-            AlertDialog(
-                onDismissRequest = { showTimePicker = false },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            val formattedHour = timePickerState.hour.toString().padStart(2, '0')
-                            val formattedMinute = timePickerState.minute.toString().padStart(2, '0')
-                            timeInput = "$formattedHour:$formattedMinute"
-                            showTimePicker = false
-                        }
-                    ) {
-                        Text("Auswählen")
-                    }
-                },
-                dismissButton = {
-                    Row {
-                        TextButton(
-                            onClick = {
-                                val now = java.time.LocalTime.now()
-                                val formattedHour = now.hour.toString().padStart(2, '0')
-                                val formattedMinute = now.minute.toString().padStart(2, '0')
-                                timeInput = "$formattedHour:$formattedMinute"
-                                showTimePicker = false
-                            }
-                        ) {
-                            Text("Jetzt")
-                        }
-                        TextButton(onClick = { showTimePicker = false }) {
-                            Text("Abbrechen")
-                        }
-                    }
-                },
-                text = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        TimePicker(state = timePickerState)
-                    }
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Such-Button
-        Button(
-            onClick = { viewModel.findBestConnections(timeInput) },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Refresh, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Verbindung suchen")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // State Verteilung
-        // UI ZUSTANDS-VERZWEIGUNG
-        when (val state = viewModel.uiState) {
-            is MainViewModel.UiState.Idle -> {
-                Text("Tippe auf das Feld, um die Uhrzeit einzustellen.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            is MainViewModel.UiState.Loading -> {
-                CircularProgressIndicator()
-                Text("Frage DB-Server ab...", modifier = Modifier.padding(top = 8.dp), fontSize = 12.sp)
-            }
-            is MainViewModel.UiState.ApiFailed -> {
-                // NEU: Fehler-Bildschirm mit zwei Optionen
+                // Time Input Section
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "⚠️", fontSize = 30.sp)
+                    Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            text = state.message,
+                            "Wann endet der Unterricht?",
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            modifier = Modifier.padding(bottom = 12.dp)
                         )
-                        Text(
-                            text = "Schlechtes Internet oder API gestört.",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onErrorContainer
+
+                        OutlinedTextField(
+                            value = timeInput,
+                            onValueChange = { timeInput = it },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
+                            leadingIcon = { Icon(Icons.Rounded.AccessTime, contentDescription = null) },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { showTimePicker = true },
+                                    colors = IconButtonDefaults.iconButtonColors(contentColor = colorScheme.primary)
+                                ) {
+                                    Icon(Icons.Rounded.EditCalendar, contentDescription = "Zeit wählen")
+                                }
+                            }
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Button(onClick = { viewModel.fetchLiveConnections(state.lastTimeInput) }) {
-                            Text("Nochmal versuchen")
-                        }
-
-                        OutlinedButton(
-                            onClick = { viewModel.loadOfflineFallback(state.lastTimeInput) },
-                            modifier = Modifier.padding(top = 8.dp)
+                        Button(
+                            onClick = { viewModel.findBestConnections(timeInput) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text("Plan-Fahrplan ansehen (Ohne Ausfall-Info)")
+                            Icon(Icons.Rounded.Search, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Verbindungen finden", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
-            }
-            is MainViewModel.UiState.Success -> {
-                StatusIndicator(isBackupActive = !state.isLive, lastSyncTime = viewModel.lastSyncTime)
-                Spacer(modifier = Modifier.height(12.dp))
 
-                if (state.connections.isEmpty()) {
-                    Text("Keine passenden Verbindungen gefunden.")
-                } else {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        items(state.connections.take(4)) { connection ->
-                            ConnectionDisplayCard(connection)
+                if (showTimePicker) {
+                    val parts = timeInput.split(":")
+                    val initialHour = parts.getOrNull(0)?.toIntOrNull() ?: 13
+                    val initialMinute = parts.getOrNull(1)?.toIntOrNull() ?: 15
+
+                    val timePickerState = rememberTimePickerState(
+                        initialHour = initialHour,
+                        initialMinute = initialMinute,
+                        is24Hour = true
+                    )
+
+                    AlertDialog(
+                        onDismissRequest = { showTimePicker = false },
+                        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false),
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    val formattedHour = timePickerState.hour.toString().padStart(2, '0')
+                                    val formattedMinute = timePickerState.minute.toString().padStart(2, '0')
+                                    timeInput = "$formattedHour:$formattedMinute"
+                                    showTimePicker = false
+                                },
+                                shape = RoundedCornerShape(12.dp)
+                            ) { Text("OK") }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showTimePicker = false }) { Text("Abbrechen") }
+                        },
+                        text = {
+                            Surface(
+                                shape = RoundedCornerShape(28.dp),
+                                color = MaterialTheme.colorScheme.surface,
+                                modifier = Modifier.padding(8.dp)
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.padding(24.dp)
+                                ) {
+                                    Text(
+                                        "Uhrzeit wählen",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        modifier = Modifier.padding(bottom = 20.dp)
+                                    )
+                                    
+                                    TimePicker(state = timePickerState)
+                                    
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    
+                                    FilledTonalButton(
+                                        onClick = {
+                                            val now = LocalTime.now()
+                                            timeInput = now.format(DateTimeFormatter.ofPattern("HH:mm"))
+                                            showTimePicker = false
+                                        },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(12.dp)
+                                    ) {
+                                        Icon(Icons.Rounded.History, contentDescription = null, modifier = Modifier.size(18.dp))
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Aktuelle Zeit übernehmen")
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Results Area
+                when (val state = viewModel.uiState) {
+                    is MainViewModel.UiState.Idle -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(top = 40.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Rounded.DirectionsTransit,
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                tint = colorScheme.outlineVariant
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                "Bereit für die Suche",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colorScheme.outline
+                            )
+                        }
+                    }
+                    is MainViewModel.UiState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(strokeWidth = 3.dp)
+                        }
+                    }
+                    is MainViewModel.UiState.ApiFailed -> {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = colorScheme.errorContainer),
+                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(Icons.Rounded.CloudOff, contentDescription = null, modifier = Modifier.size(48.dp), tint = colorScheme.error)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(state.message, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                Text("Verbindung zum Server fehlgeschlagen.", fontSize = 12.sp, textAlign = TextAlign.Center)
+                                
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Button(
+                                    onClick = { viewModel.fetchLiveConnections(state.lastTimeInput) },
+                                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error)
+                                ) {
+                                    Text("Erneut versuchen")
+                                }
+                                TextButton(onClick = { viewModel.loadOfflineFallback(state.lastTimeInput) }) {
+                                    Text("Offline-Plan nutzen", color = colorScheme.error)
+                                }
+                            }
+                        }
+                    }
+                    is MainViewModel.UiState.Success -> {
+                    StatusIndicator(isBackupActive = !state.isLive)
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        if (state.connections.isEmpty()) {
+                            Text("Keine Fahrten nach dieser Zeit gefunden.", color = colorScheme.outline)
+                        } else {
+                            LazyColumn(
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(state.connections.take(5)) { connection ->
+                                    ConnectionDisplayCard(connection)
+                                }
+                                item { Spacer(modifier = Modifier.height(80.dp)) }
+                            }
                         }
                     }
                 }
@@ -532,78 +608,148 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         }
     }
 }
-}
+
 
 
 @Composable
-fun StatusIndicator(isBackupActive: Boolean, lastSyncTime: String = "") {
-    val backgroundColor = if (isBackupActive) Color(0xFFFFEBEE) else Color(0xFFE8F5E9)
-    val contentColor = if (isBackupActive) Color(0xFFC62828) else Color(0xFF2E7D32)
-    val icon = if (isBackupActive) Icons.Default.Warning else Icons.Default.Info
-    val text = if (isBackupActive) {
-        if (lastSyncTime.isNotEmpty() && lastSyncTime != "Standard") {
-            "Offline-Fahrplan (Stand: $lastSyncTime) — DB-Server meldet Timeout"
-        } else {
-            "Offline-Fahrplan (Standard) — DB-Server meldet Timeout"
-        }
-    } else {
-        "Live-Fahrplan aktiv (Backup-Stand: $lastSyncTime)"
-    }
+fun StatusIndicator(isBackupActive: Boolean) {
+    val containerColor = if (isBackupActive) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f) 
+                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    val contentColor = if (isBackupActive) MaterialTheme.colorScheme.error 
+                      else MaterialTheme.colorScheme.primary
+    val icon = if (isBackupActive) Icons.Rounded.WifiOff else Icons.Rounded.CloudDone
+    val text = if (isBackupActive) "Offline-Plan aktiv (Keine Live-Daten)" else "Echtzeit-Daten aktiv"
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor, shape = RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        color = containerColor,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Icon(imageVector = icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(18.dp))
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, color = contentColor, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(imageVector = icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text = text, color = contentColor, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
 @Composable
 fun ConnectionDisplayCard(connection: CleanUiConnection) {
+    val isTrain = connection.type.contains("S-Bahn", ignoreCase = true)
+    val colorScheme = MaterialTheme.colorScheme
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, colorScheme.outlineVariant.copy(alpha = 0.3f))
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    text = "${connection.type} — ${connection.lineName}",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        color = if (isTrain) Color(0xFF0056D2) else Color(0xFFFF9800),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = if (isTrain) Icons.Rounded.Train else Icons.Rounded.DirectionsBus,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = connection.lineName,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = connection.type,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colorScheme.outline
+                        )
+                    }
+                }
 
                 if (connection.isLive) {
-                    if (connection.delayMinutes > 0) {
-                        Text(text = "+${connection.delayMinutes} Min.", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
-                    } else {
-                        Text(text = "Pünktlich", color = Color(0xFF2E7D32), fontSize = 12.sp)
+                    val delay = connection.delayMinutes
+                    Surface(
+                        color = if (delay > 0) colorScheme.errorContainer else Color(0xFFE8F5E9),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = if (delay > 0) "+$delay Min" else "Pünktlich",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (delay > 0) colorScheme.error else Color(0xFF2E7D32)
+                        )
                     }
-                } else {
-                    Text(text = "Geplant", color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            Text(text = "Abfahrt: ${connection.departureTime} ab ${connection.fromStop}", fontSize = 14.sp)
-            Text(text = "Ankunft: ${connection.arrivalTime} an ${connection.toStop}", fontSize = 14.sp)
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Abfahrt", style = MaterialTheme.typography.labelSmall, color = colorScheme.outline)
+                    Text(
+                        text = connection.departureTime.toString(),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(connection.fromStop, style = MaterialTheme.typography.bodySmall, maxLines = 1)
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = null,
+                    tint = colorScheme.outlineVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(modifier = Modifier.height(4.dp))
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                    Text("Ankunft", style = MaterialTheme.typography.labelSmall, color = colorScheme.outline)
+                    Text(
+                        text = connection.arrivalTime.toString(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(connection.toStop, style = MaterialTheme.typography.bodySmall, maxLines = 1, textAlign = TextAlign.End)
+                }
+            }
 
-            Text(
-                text = "Benötigter Puffer zum Startpunkt: ${connection.requiredWalkBuffer} Minuten",
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.outline
-            )
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider(thickness = 0.5.dp, color = colorScheme.outlineVariant.copy(alpha = 0.5f))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.AutoMirrored.Rounded.DirectionsWalk,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = colorScheme.outline
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Fußweg-Puffer: ${connection.requiredWalkBuffer} Min.",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colorScheme.outline
+                )
+            }
         }
     }
 }
